@@ -1,0 +1,40 @@
+.Signup-body{
+    padding: 1rem;
+}
+
+.Signup-form{
+    // display: flex;
+    // flex-direction: column;
+    width: 80%;
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.Signup-title{
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.Signup-row{
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.Signup-input{
+    width: 70%;
+    text-align: end;
+}
+
+.Signup-btn{
+    // padding: .5rem;
+    // margin: 2rem;
+    // background-color: transparent;
+    // border: 1px solid #575757;
+    // border-radius: 10px;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.Signup-login-link{
+    text-align: center;
+}
