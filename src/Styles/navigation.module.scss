@@ -1,6 +1,15 @@
 
-.Navigation-wrapper{
+.Navigation-horizental-wrapper{
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+.Navigation-vertical-wrapper{
+    position: fixed;
+    top: 10%;
+}
+
+.Navigation-body{
+    justify-content: center;
 }

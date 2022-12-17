@@ -1,15 +1,16 @@
 import React from 'react'
 
-import { Outlet, Navigation } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router-dom'
 
+import { supabase } from './supabaseClient'
 
-
-// const { user } = UserContext()
+const { data: { session } } = await supabase.auth.getSession()
 
 function publicRoute() {
-  return (
-    <div>publicRoute</div>
-  )
+  if(session){
+    return <Navigate to="/" />
+  }
+  return <Outlet />
 }
 
 export default publicRoute

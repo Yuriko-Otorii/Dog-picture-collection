@@ -3,6 +3,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 2rem;
 }
 
 .Profile-header-wrapper{
@@ -24,15 +25,73 @@
 }
 
 .Profile-img{
-    background-image: url("../pictures/homePic3.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
     width: 5rem;
     height: 5rem;
+    border-radius: 10px;
 }
 
 .Profile-tab-wrapper{
     display: flex;
     justify-content: center;
+    max-width: 700px;
 }
+
+.Profile-btn-wrapper{
+    display: flex;
+    justify-content: space-around;
+    margin: .5rem;
+}
+
+.Profile-header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: .5rem;
+}
+
+.Profile-header-title{
+    margin-right: .5rem;
+}
+
+.Profile-favorite-pics-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Profile-favorite-pic{
+    width: 200px;
+    height: 200px;
+    margin: .5rem;   
+    border-radius: 10px;
+}
+
+.Profile-pic-btn-wrapper{
+    position: relative;
+}
+
+.Profile-favorite-deleteBtn{
+    position: absolute;
+    bottom: 10%;
+    right: 10%;
+    padding: .3rem;
+}
+
+.Profile-favorite-posts{
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 2rem;
+}
+
+.Profile-no-favorite-posts{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+
+
 

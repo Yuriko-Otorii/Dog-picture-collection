@@ -2,17 +2,31 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 1rem;
+    padding-bottom: 2rem;
 }
 
 .Search-img-wrapper{
-    // display: flex;
-    // flex-direction: column;
-    // align-items: center;
+    margin: 0 auto;
     padding: 1rem;   
+    max-width: 700px;
 }
 
 .Search-each-img{
-    padding: 1rem;   
+    width: 200px;
+    height: 200px;
+    padding: .5rem;   
+    border-radius: 20px;
+}
+
+.Search-img-div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Search-like-btn{
+    text-align: center;
+    margin-bottom: 2rem;
 }
 

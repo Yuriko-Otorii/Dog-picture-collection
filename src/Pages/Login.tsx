@@ -12,21 +12,21 @@ type loginItems = {
   password: string;
 };
 
+
 function Login() {
   const navigate = useNavigate()
-  const [session, setSession] = useState(null)
-
+  
   const handleOnSubmit = async (values: loginItems) => {
-    console.log(values.email);
     
     const { data, error } = await supabase.auth.signInWithPassword({
       email: values.email, 
       password: values.password,
-    })   
-    navigate('/')
+    })  
+    navigate('/')    
     error && console.log(error);
   };
 
+  
   return (
     <>
       <div className={loginStyle["Login-body"]}>

@@ -14,21 +14,25 @@ type signupItem = {
   password: string;
 };
 
+
+
 function SignUp() {
   const navigate = useNavigate()
 
   const supabaseSignup = async (signupItem: signupItem) => {
     const { data, error } = await supabase.auth.signUp({email: signupItem.email, password: signupItem.password});
-      navigate('/')
-
       error && console.log(error);
-      
+
   };
 
   const handleSubmit = async (values: signupItem) => {
-    supabaseSignup(values);
     try {      
-      await supabase.from("users").insert([{ username: values.username, }]);
+      await supabaseSignup(values);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();      
+      await supabase.from("users").insert([{ username: values.username, userId: session?.user.id}]);
+      navigate('/')
     } catch (error) {
       console.error(error)
     }

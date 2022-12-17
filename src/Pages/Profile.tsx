@@ -1,102 +1,107 @@
 import React, { useState, useEffect } from "react";
 
-import { Tabs, Avatar, Button, Card } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Tabs, Button, Avatar } from "antd";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
 
 import { supabase } from "../Auth/supabaseClient";
 import dogImg1 from "../pictures/homePic2.jpg";
-import { Post } from "../DataTypes/Post.type";
+import koala from "../pictures/koala.jpg";
+import kangaroo from "../pictures/kangaroo.jpg";
 import profileStyle from "../Styles/profile.module.scss";
-import Navigation from "../Components/Navigation";
-import Meta from "antd/es/card/Meta";
+import { useNavigate } from "react-router-dom";
+import FavoritePics from "../Components/FavoritePics";
+import { FavObj as FavListType } from "../Components/FavoritePics";
+import Header from "../Components/Header";
+import FavoritePosts from "../Components/FavoritePosts";
+
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+type UserInfo = {
+  username: string;
+  avaterImg: string;
+};
 
 function Profile() {
-  const [userItems, setUserItems] = useState<Post[]>([]);
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [favPics, setFavPics] = useState<FavListType[]>([]);
 
-  useEffect(() => {
-    // fetchUserItems()
-    // console.log(user);
-  }, []);
-
-  // const user = supabase.auth.getUser();
-
-  const fetchUserItems = async () => {
-    const { data, error } = await supabase.from("all posts").select("*");
-
-    if (error) console.error("Error: ", error);
-    else setUserItems(data);
+  const fetchFavPics = async () => {
+    try {
+      const { data }: any = await supabase
+        .from("liked_pics")
+        .select("url")
+        .eq("user_id", session?.user.id);
+      setFavPics(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const onChange = () => {};
+  const fetchUserInfo = async () => {
+    const { data }: any = await supabase
+      .from("users")
+      .select("username, avaterImg")
+      .eq("userId", session?.user.id);
+    setUserInfo(data[0]);
+  };
 
-  const edit = "Edit profile"
+  useEffect(() => {
+    if (!session) navigate("/login");
+    fetchFavPics();
+    fetchUserInfo();
+  }, []);
 
-  //Upload avatar img file
-  //   const avatarFile = event.target.files[0];
-  //   const { data, error } = await supabase.storage
-  //     .from("avatars")
-  //     .upload("public/avatar1.png", avatarFile);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/login");
+  };
 
   return (
     <>
       <div className={profileStyle["Profile-body-wrapper"]}>
-        {/* <h1 style={{textAlign: "center"}}>Profile Page</h1> */}
+        <Header title="Profile Page" />
         <div className={profileStyle["Profile-header-wrapper"]}>
-          
-          {/* <Card
-            style={{ width: 300, marginTop: 16 }}
-            actions={[<EditOutlined key="Edit profile" />]}
-          >
-            <Meta
-              avatar={<Avatar size="large"
-              gap={0.1}
-              shape="square"
-              src={dogImg1}
-              />}
-              title="username"
-              
-            />
-          </Card> */}
           <div className={profileStyle["Profile-user-wrapper"]}>
-          {/* <Avatar size="large"
-              gap={0.1}
-              shape="square"
-              src={dogImg1}
-          /> */}
-            <div className={profileStyle["Profile-img"]}></div>
-            {/* <img src={dogImg1} className={profileStyle["Profile-img"]} /> */}
-            <h3 style={{marginLeft: "1.5rem"}}>username</h3>
+            {/* {userInfo?.avaterImg ? (
+              <Avatar shape="square" size={64} icon={<UserOutlined />} />
+            ) : (
+              <img src={kangaroo} className={profileStyle["Profile-img"]} />
+            )} */}
+            <Avatar shape="square" size={64} icon={<UserOutlined />} />
+            <h3 style={{ marginLeft: "1.5rem" }}>{userInfo?.username}</h3>
           </div>
-          <Button icon={<EditOutlined />} type="link">
-            Edit profile
-          </Button>
+          <div className={profileStyle["Profile-btn-wrapper"]}>
+            {/* <Button icon={<EditOutlined />} type="link">
+              Edit profile
+            </Button> */}
+            <Button onClick={handleLogout}>Log out</Button>
+          </div>
         </div>
 
         <div className={profileStyle["Profile-tab-wrapper"]}>
           <Tabs
+            tabBarStyle={{ margin: "0 auto" }}
             defaultActiveKey="1"
-            onChange={onChange}
             items={[
               {
-                label: `Posts`,
+                label: `Favorite Pics`,
                 key: "1",
-                children: `Posts`,
+                children: (
+                  <FavoritePics picList={favPics} setList={setFavPics} />
+                ),
               },
               {
-                label: `Favorite`,
+                label: `Posts`,
                 key: "2",
-                children: `Favorite`,
-              },
-              {
-                label: `Followers`,
-                key: "3",
-                children: `Followers`,
+                children: <FavoritePosts />,
               },
             ]}
           />
         </div>
       </div>
-      <Navigation />
     </>
   );
 }

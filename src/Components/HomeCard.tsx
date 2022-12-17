@@ -1,6 +1,5 @@
-import React, { ReactNode } from "react";
 
-import { Avatar, Image, Card } from "antd";
+import { Avatar, Card } from "antd";
 import {
   EditOutlined,
   EllipsisOutlined,
@@ -26,20 +25,19 @@ function HomeCard({ item }: { item: Post }) {
           cover={
             <img
               alt="home pictute"
-              src={dogImg2}
+              src={item.postImg}
               style={{ width: "300px", height: "250px" }}
             />
           }
-          actions={[
-            <EditOutlined key="edit" />,
-            <EllipsisOutlined key="ellipsis" />,
-            <HeartOutlined key="Favorite" />,
-          ]}
+          // actions={[
+          //   <EditOutlined key="edit" />,
+          //   <EllipsisOutlined key="ellipsis" />,
+          //   <HeartOutlined key="Favorite" />,
+          // ]}
         >
           <Meta
             avatar={<Avatar shape="square" src={dogImg1} />}
-            // title={item.userName}
-            title="username"
+            title={item.username}
           />
           <p style={{ marginTop: ".5rem", fontSize: ".7rem" }}>{timestamp}</p>
           <p style={{ marginTop: ".8rem" }}>{item.postText}</p>
