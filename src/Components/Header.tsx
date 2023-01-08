@@ -5,7 +5,7 @@ type Props = {
 }
 
 
-function Header({title}: Props) {
+const Header = ({title}: Props) => {
   return (
     <>
         <h2 style={{ marginBottom: "1rem" }}>{title}</h2>

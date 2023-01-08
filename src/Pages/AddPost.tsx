@@ -1,104 +1,132 @@
 import React, { useEffect, useState } from "react";
 
-import { Form, Input, Button, Upload, message } from "antd";
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import type { UploadChangeParam } from "antd/es/upload";
-import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
+import { Form, Input, Button, message, Upload } from "antd";
+// import ImgCrop from 'antd-img-crop';
+import { UploadOutlined } from "@ant-design/icons";
+import type { UploadFile } from "antd/es/upload/interface";
+import {v4 as uuidv4 } from "uuid"
 
-import dogGif from "../pictures/dogGif.gif"
 import addPostStyle from "../Styles/addPost.module.scss";
 import { supabase } from "../Auth/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
 
 const { TextArea } = Input;
-const {
-  data: { session },
-} = await supabase.auth.getSession();
+
+const { data: { user: currentUser } } = await supabase.auth.getUser()
 
 
-function AddPost() {
-  const [imgURL, setImgUrl] = useState<string>()
-  const [loading, setLoading] = useState(false);
-  // const [imageUrl, setImageUrl] = useState<string[]>([]);
+const AddPost = () => {
+  const [error, setError] = useState(false)
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [uploading, setUploading] = useState<boolean>(false)
+  const [messageApi, contextHolder] = message.useMessage()
   const navigate = useNavigate();
-
+  const [form] = Form.useForm();
+  
   useEffect(() => {
-    if (!session) navigate("/login");
+    if (!currentUser) navigate("/login");
   }, []);
 
-  const handleChange = (response: any) => {
-    if (response.file.status !== 'uploading') {
-      console.log(response.file, response.fileList);
-    }
-    if (response.file.status === 'done') {
-      message.success(`${response.file.name} 
-                       file uploaded successfully`);
-    } else if (response.file.status === 'error') {
-      message.error(`${response.file.name} 
-                     file upload failed.`);
-    }  
+  const handleSubmit = async (values: any) => {
+    try {      
+      setUploading(true);
+      const uuid = uuidv4()
+      const {data, error } = await supabase
+        .storage
+        .from("post-photos")
+        .upload(`${currentUser?.id}/${uuid}`, values.postImg.file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      const key: string | undefined = data?.path;
+      const { data: publicUrl } = supabase.storage.from("post-photos").getPublicUrl(key!)
+      
+      await supabase.from("all-posts").insert([{
+        userId: currentUser?.id,
+        postText: values.postText,
+        postImg: publicUrl
+      }])      
+      
+      form.resetFields();
+      setUploading(false)
+      
+      //Success alart
+      messageApi.open({
+        type: 'success',
+        content: 'Successfully added.',
+      })        
+
+    } catch (error) {
+      console.error(error);
+      messageApi.open({
+        type: 'error',
+        content: 'Something went wrong. Please try again.',
+      })
+    }   
+      
   };
-  const handleSubmit = () => {};
 
-
-  const uploadButton = (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
+  const handleFailed = () => {
+    setError(true)
+  }
 
   return (
-    <div className={addPostStyle["addPost-body-wrapper"]}>
-      <h1 style={{margin: "5rem auto 2rem"}}>Coming soon!</h1>
-      <img src={dogGif} alt="Dog gif" />
-    </div>
-  )
-  // (
-  //   <>
-  //     <div className={addPostStyle["addPost-body-wrapper"]}>
-  //       {/* <h2 style={{ marginBottom: "1rem" }}>Create new post</h2> */}
-  //       <Header title="Create new post" />
-  //       <Form onFinish={handleSubmit}>
-  //         <Form.Item
-  //           name="postText"
-  //           label="Text"
-  //           // labelCol={{ span: 9 }}
-  //           labelAlign="right"
-  //         >
-  //           <TextArea rows={3} placeholder="Write about dog..." />
-  //         </Form.Item>
-  //         <Form.Item
-  //           name="postImg"
-  //           label="Image"
-  //           labelAlign="right"
-  //           style={{ width: "100px" }}
-  //           valuePropName="checked"
-  //         >
-  //           <Upload
-  //             listType="picture-card"
-  //             showUploadList={false}
-  //             beforeUpload={(file) => {
-  //               console.log("beforeUpload", file);
-  //             }}
-  //             onChange={handleChange}
-  //           >
-  //             {imgURL ? imgURL : uploadButton}
-  //           </Upload>
-  //         </Form.Item>
-  //         <Form.Item className={addPostStyle["addPost-post-btn"]}>
-  //           <Button type="primary" htmlType="submit" size="large">
-  //             Post
-  //           </Button>
-  //         </Form.Item>
-  //       </Form>
-  //     </div>
-  //   </>
-  // );
+    <>
+      {contextHolder}
+      <div className={addPostStyle["addPost-body-wrapper"]}>
+        <Header title="Create new post" />
+        <Form onFinish={handleSubmit} onFinishFailed={handleFailed} form={form}>
+          <Form.Item
+            name="postText"
+            label="Text"
+            labelAlign="right"
+            style={{ width: "300px" }}
+            labelCol={{ span: 9 }}
+          >
+            <TextArea rows={3} placeholder="Write about dog..." />
+          </Form.Item>
+          <Form.Item
+            name="postImg"
+            label="Image"
+            labelAlign="right"
+            style={{ width: "300px" }}
+            valuePropName="checked"
+            labelCol={{ span: 9 }}
+          >
+          <Upload 
+            listType="picture"
+            maxCount={1}
+            accept=".png, .jpeg"
+            beforeUpload={file => {
+              setFileList([...fileList, file])
+              return false
+            }}
+          >
+            <Button icon={<UploadOutlined />}>Select File</Button>
+          </Upload>
+           
+          </Form.Item>
+          <Form.Item className={addPostStyle["addPost-post-btn"]}>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              size="large"
+              loading={uploading}
+              disabled={fileList.length === 0}
+              >
+              Post
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </>
+  );
 }
 
 export default AddPost;
 
-
 //https://www.to-r.net/media/supabase-next/
+
+// https://zenn.dev/naoko3in4/articles/c7e75181c2a5a7#%E3%82%B9%E3%83%86%E3%83%BC%E3%83%88%E7%AE%A1%E7%90%86

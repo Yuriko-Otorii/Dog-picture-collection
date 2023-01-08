@@ -41,11 +41,13 @@ export const fetchAllDogsImg = createAsyncThunk(
         
         //Check if users fav images are in display images
         const { data: userFavPics } = await supabase
-        .from("liked_pics")
+        .from("liked-pics")
         .select('url')
         .eq("user_id", session?.user.id)
         const userFavPicsArr =  userFavPics?.map((item) => item.url)
         const likedImgs = imgsList.filter((itemFromApi: string) => userFavPicsArr!.includes(itemFromApi))
+
+        //Create liked btn state
         const setBtnStateList = remapImgsList.map((item: remapObj) => {
             if(likedImgs.includes(item.url)){
                 return {btnState: true, url: item.url}
@@ -70,14 +72,16 @@ export const fetchselectedBreedPics = createAsyncThunk(
             const remapImgsList = imgsList.map((item: string) => {
                 return {btnState: false, url: item}
             })
+
             //Check if users fav images are in display images
             const { data: userFavPics } = await supabase
-            .from("liked_pics")
+            .from("liked-pics")
             .select('url')
             .eq("user_id", session?.user.id)
             const userFavPicsArr =  userFavPics?.map((item) => item.url)
             const likedImgs = imgsList.filter((itemFromApi: string) => userFavPicsArr!.includes(itemFromApi))            
 
+            //Create liked btn state
             const setBtnStateList = remapImgsList.map((item: remapObj) => {
                 if(likedImgs.includes(item.url)){
                     return {btnState: true, url: item.url}
@@ -99,13 +103,13 @@ export const fetchselectedBreedPics = createAsyncThunk(
 
             //Check if users fav images are in display images
             const { data: userFavPics } = await supabase
-            .from("liked_pics")
+            .from("liked-pics")
             .select('url')
             .eq("user_id", session?.user.id)
             const userFavPicsArr =  userFavPics?.map((item) => item.url)
             const likedImgs = imgsList.filter((itemFromApi: string) => userFavPicsArr!.includes(itemFromApi))
 
-            
+            //Create liked btn state
             const setBtnStateList = remapImgsList.map((item: remapObj) => {
                 if(likedImgs.includes(item.url)){
                     return {btnState: true, url: item.url}
@@ -119,24 +123,32 @@ export const fetchselectedBreedPics = createAsyncThunk(
 )
 
 export interface dogImgState {
-    dogImgList: string[]
+    dogImgList: remapObj[]
     loading: 'idle' | 'pending' | 'succeeded' | 'failed'
-    likedimgs: string[]
+    // likedimgs: string[]
 } 
 
 const initialState = {
     dogImgList: [],
     loading: 'idle',
-    likedimgs: []
+    // likedimgs: []
 } as dogImgState
 
 const dogImgSlice = createSlice({
     name: "dogImgs",
     initialState,
     reducers: {
-        // changeBtnState: (state, action) => {
-        //     return state.dogImgList[action.payload.id]
-        // }
+        changeBtnState: (state, action) => {
+            state.dogImgList.map(item => {                
+                if(!(item.btnState) && (item.url === action.payload.url)){
+                    return item.btnState = true
+                }else if(item.btnState && (item.url === action.payload.url)){
+                    return item.btnState = false
+                }else{
+                    return item
+                }
+            })
+        }
     },
     extraReducers: (builder) => {
         //Set initial imgs
@@ -145,7 +157,7 @@ const dogImgSlice = createSlice({
         })
         builder.addCase(fetchAllDogsImg.fulfilled, (state, action) => {
             state.dogImgList = action.payload[0]
-            state.likedimgs = action.payload[1]
+            // state.likedimgs = action.payload[1]
             state.loading = "succeeded"      
         })
         builder.addCase(fetchAllDogsImg.rejected, (state) => {
@@ -158,7 +170,7 @@ const dogImgSlice = createSlice({
         })
         builder.addCase(fetchselectedBreedPics.fulfilled, (state, action) => {
             state.dogImgList = action.payload[0]
-            state.likedimgs = action.payload[1]
+            // state.likedimgs = action.payload[1]
             state.loading = "succeeded"       
         })
         builder.addCase(fetchselectedBreedPics.rejected, (state) => {
@@ -167,5 +179,5 @@ const dogImgSlice = createSlice({
     }
 })
 
-// export const { changeBtnState } = dogImgSlice.actions
+export const { changeBtnState } = dogImgSlice.actions
 export default dogImgSlice.reducer

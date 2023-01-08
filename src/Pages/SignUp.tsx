@@ -14,41 +14,59 @@ type signupItem = {
   password: string;
 };
 
-
-
-function SignUp() {
-  const navigate = useNavigate()
+const SignUp = () => {
+  const navigate = useNavigate();
 
   const supabaseSignup = async (signupItem: signupItem) => {
-    const { data, error } = await supabase.auth.signUp({email: signupItem.email, password: signupItem.password});
-      error && console.log(error);
-
+    const { data, error } = await supabase.auth.signUp({
+      email: signupItem.email,
+      password: signupItem.password,
+    });
+    error && console.log(error);
   };
 
   const handleSubmit = async (values: signupItem) => {
-    try {      
+    try {
       await supabaseSignup(values);
       const {
         data: { session },
-      } = await supabase.auth.getSession();      
-      await supabase.from("users").insert([{ username: values.username, userId: session?.user.id}]);
-      navigate('/')
+      } = await supabase.auth.getSession();
+      await supabase
+        .from("users")
+        .insert([{ username: values.username, userId: session?.user.id }]);
+      navigate("/");
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
+  };
+
+  const passwordValidator = {
+    lowerCaseLetters: /[a-z]/g,
+    upperCaseLetters: /[A-Z]/g,
+    numbers: /[0-9]/g,
+    length: 8,
+  }
+
+  const validateMessages = {
+    required: "${label} is required",
+    email: "${label} is not a valid email"    
   };
 
   return (
     <>
       <div className={signUpStyle["Signup-body"]}>
         <h2 className={signUpStyle["Signup-title"]}>Sign up</h2>
-        <Form onFinish={handleSubmit} className={signUpStyle["Signup-form"]}>
+        <Form
+          onFinish={handleSubmit}
+          className={signUpStyle["Signup-form"]}
+          validateMessages={validateMessages}
+        >
           <Form.Item
             name="username"
             label="User name"
             labelCol={{ span: 9 }}
             labelAlign="right"
-            rules={[{ required: true, message: "Please input your Username!" }]}
+            rules={[{ required: true }]}
           >
             <Input
               placeholder="Username"
@@ -61,16 +79,7 @@ function SignUp() {
             label="E-mail"
             labelCol={{ span: 9 }}
             labelAlign="right"
-            rules={[
-              {
-                type: "email",
-                message: "The input is not valid E-mail!",
-              },
-              {
-                required: true,
-                message: "Please input your E-mail!",
-              },
-            ]}
+            rules={[{ type: "email" }, { required: true }]}
           >
             <Input
               placeholder="E-mail"
@@ -84,13 +93,48 @@ function SignUp() {
             label="Password"
             labelCol={{ span: 9 }}
             labelAlign="right"
-            rules={[
-              {
-                required: true,
-                message: "Please input your password!",
-              },
+            rules={[{required: true}, 
+              //Check lowercase letters
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue('password').match(passwordValidator.lowerCaseLetters)) {
+                    return Promise.resolve();
+                  }else{
+                    return Promise.reject(new Error('Password must include lowercase letters'));
+                  }                  
+                },
+              }),
+              //Check uppercase letters
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue('password').match(passwordValidator.upperCaseLetters)) {
+                    return Promise.resolve();
+                  }else{
+                    return Promise.reject(new Error('Password must include uppercase letters'));
+                  }                  
+                },
+              }),
+              //Check numbers
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue('password').match(passwordValidator.numbers)) {
+                    return Promise.resolve();
+                  }else{
+                    return Promise.reject(new Error('Password must include numbers'));
+                  }                  
+                },
+              }),
+              //Check length
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue('password').length >= 8) {
+                    return Promise.resolve();
+                  }else{
+                    return Promise.reject(new Error('Password must be more than 8 characters'));
+                  }                  
+                },
+              }),
             ]}
-            hasFeedback
           >
             <Input.Password
               placeholder="Password"
@@ -106,11 +150,7 @@ function SignUp() {
             labelAlign="right"
             dependencies={["password"]}
             hasFeedback
-            rules={[
-              {
-                required: true,
-                message: "Please confirm your password!",
-              },
+            rules={[{required: true},
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue("password") === value) {
@@ -118,7 +158,7 @@ function SignUp() {
                   }
                   return Promise.reject(
                     new Error(
-                      "The two passwords that you entered do not match!"
+                      "The two passwords that you entered do not match."
                     )
                   );
                 },
@@ -132,11 +172,7 @@ function SignUp() {
             />
           </Form.Item>
           <Form.Item className={signUpStyle["Signup-btn"]}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-            >
+            <Button type="primary" htmlType="submit" size="large">
               Register
             </Button>
           </Form.Item>
@@ -147,7 +183,7 @@ function SignUp() {
       </div>
     </>
   );
-}
+};
 
 export default SignUp;
 

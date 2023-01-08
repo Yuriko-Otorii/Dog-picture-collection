@@ -1,20 +1,19 @@
-import React, { ReactNode, useEffect } from 'react'
-import { Navigate } from 'react-router-dom';
+import { ReactNode } from 'react'
+import { Navigate, Outlet } from 'react-router-dom';
 
-
-import { supabase } from './supabaseClient'
-
-const { data: { session } } = await supabase.auth.getSession()
+import { useAuth } from './AuthContext';
 
 type Props = {
     children?: ReactNode;
 };
 
-function privateRoute({children}: Props) {
-    if(!session){
-        return <Navigate to={"/login"} />
+function PrivateRoute({children}: Props) {
+    const { user } = useAuth();
+
+    if(!user){
+        return <Navigate to="/login" />
     }
-    return children
+    return <>{children}</>
 }
 
-export default privateRoute
+export default PrivateRoute

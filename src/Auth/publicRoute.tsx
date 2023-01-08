@@ -1,16 +1,19 @@
-import React from 'react'
-
+import { ReactNode } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
+import { useAuth } from './AuthContext';
 
-import { supabase } from './supabaseClient'
 
-const { data: { session } } = await supabase.auth.getSession()
+type Props = {
+  children?: ReactNode;
+};
 
 function publicRoute() {
-  if(session){
-    return <Navigate to="/" />
+  const { user } = useAuth();
+
+  if(user){
+    return <Navigate to="/login" />
   }
-  return <Outlet />
+  return <Outlet/>
 }
 
 export default publicRoute

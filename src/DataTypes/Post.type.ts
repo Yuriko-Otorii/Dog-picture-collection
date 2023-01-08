@@ -1,3 +1,4 @@
+import { User } from "../DataTypes/User.type"
 export interface Post {
     postId: number;
     userId: number;
@@ -5,9 +6,10 @@ export interface Post {
     avaterImg: string;
     postText: string;
     postImg: string;
-    likes: number;
-    isLiked: boolean;
     postDate: string;
+    likes?: number;
+    isLiked?: boolean;
     tags?: [];
     comments?: [];
+    users: User;
 }

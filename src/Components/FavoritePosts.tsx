@@ -3,7 +3,12 @@ import React from "react";
 import ProfileStyle from "../Styles/profile.module.scss";
 import dogGif2 from "../pictures/dogGif2.gif"
 
-function FavoritePosts() {
+type Props = {
+  picList: FavObj[];
+  setList: React.Dispatch<React.SetStateAction<FavListType[]>>;
+};
+
+const FavoritePosts = () => {
   return (
     <>
       <div className={ProfileStyle["Profile-favorite-posts"]}>

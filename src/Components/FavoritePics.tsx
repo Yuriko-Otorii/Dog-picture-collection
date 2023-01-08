@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { supabase } from "../Auth/supabaseClient";
 import favoritePicsStyle from "../Styles/profile.module.scss";
 import { FavObj as FavListType } from "../Components/FavoritePics";
-import Item from "antd/es/list/Item";
-import dogGif3 from "../pictures/dogGif3.gif"
-
+import dogGif3 from "../pictures/dogGif3.gif";
 
 const {
   data: { session },
@@ -18,53 +16,58 @@ const {
 
 type Props = {
   picList: FavObj[];
-  setList:  React.Dispatch<React.SetStateAction<FavListType[]>>;
+  setList: React.Dispatch<React.SetStateAction<FavListType[]>>;
 };
 
 export type FavObj = {
   url: string;
 };
 
-function FavoritePics({ picList, setList }: Props) {
+const FavoritePics = ({ picList, setList }: Props) => {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
   const deleteFavPic = async (value: string) => {
     // Get users favorite img unique key
-    const { data: userFavPics } = await supabase.from("liked_pics").select('url, picture_id').eq("user_id", session?.user.id)
-    const getImgUrl = userFavPics?.filter((item) => item.url === value)
+    const { data: userFavPics } = await supabase
+      .from("liked-pics")
+      .select("url, picture_id")
+      .eq("user_id", session?.user.id);
+    const getImgUrl = userFavPics!.filter((item) => item.url === value);
 
     // Delete img base on unique key
     try {
       const { data } = await supabase
-      .from("liked_pics")    
-      .delete()
-      .eq("picture_id", getImgUrl![0].picture_id)  
-      setList(picList.filter((item: FavObj) => (item.url !== getImgUrl![0].url)))
+        .from("liked-pics")
+        .delete()
+        .eq("picture_id", getImgUrl![0].picture_id);
+      setList(picList.filter((item: FavObj) => item.url !== getImgUrl![0].url));
 
       messageApi.open({
-        type: 'success',
-        content: 'Successfully deleted',
-      });     
+        type: "success",
+        content: "Successfully deleted",
+      });
     } catch (error) {
       messageApi.open({
-        type: 'error',
-        content: 'Something went wrong...Please try again',
+        type: "error",
+        content: "Something went wrong...Please try again",
       });
     }
-    
-  }
-  
+  };
+
   return (
     <>
-    {contextHolder}
+      {contextHolder}
       <div className={favoritePicsStyle["Profile-favorite-pics-wrapper"]}>
         <Row gutter={[10, 10]} justify="center">
           {picList.length > 0 ? (
             picList.map((item) => {
               return (
-                <div key={uuidv4()} className={favoritePicsStyle["Profile-pic-btn-wrapper"]}>
-                  <Col  xs={24} sm={12} md={12} lg={8} flex="0">
+                <div
+                  key={uuidv4()}
+                  className={favoritePicsStyle["Profile-pic-btn-wrapper"]}
+                >
+                  <Col xs={24} sm={12} md={12} lg={8} flex="0">
                     <img
                       className={favoritePicsStyle["Profile-favorite-pic"]}
                       alt="Favorite image"
@@ -73,16 +76,17 @@ function FavoritePics({ picList, setList }: Props) {
                   </Col>
                   <Button
                     shape="circle"
+                    size="small"
                     onClick={() => deleteFavPic(item.url)}
                     className={favoritePicsStyle["Profile-favorite-deleteBtn"]}
                   >
-                    <DeleteOutlined />
+                    <DeleteOutlined style={{ padding: ".25rem" }} />
                   </Button>
                 </div>
               );
             })
           ) : (
-            <div className={favoritePicsStyle['Profile-no-favorite-posts']}>
+            <div className={favoritePicsStyle["Profile-no-favorite-posts"]}>
               <h3>No favorite pictures</h3>
               <Button
                 onClick={() => {
@@ -99,6 +103,6 @@ function FavoritePics({ picList, setList }: Props) {
       </div>
     </>
   );
-}
+};
 
 export default FavoritePics;

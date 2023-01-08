@@ -1,38 +1,52 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { useNavigate, useLoaderData } from "react-router-dom";
-import { Space } from "antd";
+import { Space, Spin } from "antd";
 
 import { supabase } from "../Auth/supabaseClient";
 import HomeCard from "../Components/HomeCard";
 import homeStyle from "../Styles/home.module.scss";
 import { Post } from "../DataTypes/Post.type";
-import { fetchAllPosts } from "../Api/api";
 import Header from "../Components/Header";
+import { useAuth } from "../Auth/AuthContext";
 
-const { data: { session } } = await supabase.auth.getSession()
+export const fetchAllPosts = async () => {
+  let { data: posts, error } = await supabase
+    .from("all-posts")
+    .select("*, users(*)");
+  if (error) console.log("error", error);
 
-function Home() {
+  posts?.map((item) => {
+    const postImgUrl = JSON.parse(item.postImg).publicUrl;
+    const avatarImgUrl = JSON.parse(item.users.avatarImg).publicUrl;
+    return (item.postImg = postImgUrl), (item.users.avatarImg = avatarImgUrl);
+  });
+
+  return posts;
+};
+
+const Home = () => {
   const navigate = useNavigate();
   const allPosts = useLoaderData() as Post[];
+  const { user } = useAuth();
 
   useEffect(() => {
-    if(!session) navigate("/login");  
-  }, [])
+    // if(!currentUser) navigate("/login")
+  });
 
   return (
-    <>
-      <div className={homeStyle["Home-wrapper"]}>
-        <Header title="Home" />
-        <Space direction="vertical" size="middle">
-          {allPosts.map((item) => (
-            <HomeCard item={item} key={item.postId} />
-          ))}
-        </Space>
-      </div>      
-    </>
+    <div className={homeStyle["Home-wrapper"]}>
+      <Header title="Home" />
+      <Space direction="vertical" size="middle">
+        {allPosts.map((item) => (
+          <HomeCard item={item} key={item.postId} />
+        ))}
+      </Space>
+    </div>
   );
-}
+
+  // }
+};
 
 export default Home;
 

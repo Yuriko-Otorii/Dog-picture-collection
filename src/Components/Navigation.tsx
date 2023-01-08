@@ -5,7 +5,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Menu, Grid } from "antd";
-import type { MenuProps } from 'antd';
+import type { MenuProps } from "antd";
 
 const { useBreakpoint } = Grid;
 
@@ -14,12 +14,10 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-
-function Navigation() {
-  const navigate = useNavigate()
+const Navigation = () => {
+  const navigate = useNavigate();
   const screens = useBreakpoint();
   // console.log(screens.sm);
-  
 
   const navItems = [
     { label: "Home", key: "/", icon: <HomeOutlined /> },
@@ -33,7 +31,7 @@ function Navigation() {
     getItem("Post", "/addPost", <FileAddOutlined />),
     getItem("Find", "/find", <SearchOutlined />),
     getItem("Profile", "/profile", <UserOutlined />),
-  ]
+  ];
 
   function getItem(
     label: React.ReactNode,
@@ -47,53 +45,34 @@ function Navigation() {
       icon,
       children,
       label,
-      type
+      type,
     } as MenuItem;
   }
 
   return (
     <>
       <Outlet />
-      {!(screens.sm)? (
+      {!screens.sm ? (
         <div className={navStyle["Navigation-horizental-wrapper"]}>
-        <Menu
-          items={navItems}
-          mode="horizontal"
-          onClick={({ key }) => navigate(key)}
-          className={navStyle["Navigation-body"]}
-        />
-      </div>
+          <Menu
+            items={navItems}
+            mode="horizontal"
+            onClick={({ key }) => navigate(key)}
+            className={navStyle["Navigation-body"]}
+          />
+        </div>
       ) : (
         <div className={navStyle["Navigation-vertical-wrapper"]}>
-        <Menu 
-          onClick={({ key }) => navigate(key)}
-          style={{ width: 150 }}
-          mode="inline"
-          items={verticalMenuItems}
-        />
-      </div>
-      )
-        
-    }
-
-      {/* // <div className={navStyle["Navigation-horizental-wrapper"]}>
-      //   <Menu
-      //     items={navItems}
-      //     mode="horizontal"
-      //     onClick={({ key }) => navigate(key)}
-      //     className={navStyle["Navigation-body"]}
-      //   />
-      // </div> */}
-      {/* // <div className={navStyle["Navigation-vertical-wrapper"]}>
-      //   <Menu 
-      //     onClick={({ key }) => navigate(key)}
-      //     style={{ width: 120 }}
-      //     mode="inline"
-      //     items={verticalMenuItems}
-      //   />
-      // </div> */}
+          <Menu
+            onClick={({ key }) => navigate(key)}
+            style={{ width: 150 }}
+            mode="inline"
+            items={verticalMenuItems}
+          />
+        </div>
+      )}
     </>
   );
-}
+};
 
 export default Navigation;

@@ -1,9 +1,9 @@
 export interface User {
     userId: Number;
-    userName: String;
+    username: String;
     email?: String;
     password?: String;
-    avaterImg: String;
+    avatarImg: String;
     posts: {postList: []};
     favPosts: [];
     favPics: [];

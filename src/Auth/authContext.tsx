@@ -1,36 +1,47 @@
-import { ReactNode, createContext, useState, useEffect, useContext } from "react";
+import {
+  ReactNode,
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+} from "react";
 import { Session, User } from "@supabase/supabase-js";
+
 import { Navigate } from "react-router-dom";
 
 import { supabase } from "./supabaseClient";
-// import { Auth } from '@supabase/ui'
 
 type Props = {
-    children?: ReactNode;
+  children?: ReactNode;
 };
 
-type AuthContextType = {
-    currentUser: User | null | undefined;
+type ContextProps = {
+  user: any | null;
+};
+
+const AuthContext = createContext<Partial<ContextProps>>({user: null});
+
+export function useAuth() {
+  return useContext(AuthContext);
 }
 
+export const AuthProvider = ({ children }: Props) => {
+  const [user, setUser] = useState<User | null>(null);
 
-const userContext = createContext<AuthContextType>({ currentUser: undefined })
+  useEffect(() => {
+    async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      setUser(currentUser);
+    };
+  }, [user]);
 
-export const AuthProvider = ({children}: Props) => {
-    // const [currentUser, setCurrentUser] = useState()
-    // const [session, setSession] = useState()
-    // // const [loading, setLoading] = useState(false)
+  return (
+    <AuthContext.Provider value={{ user }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-    // useEffect(() => {
-    //     supabase.auth.onAuthStateChange((event, session) => {
-    //         console.log(session);
-    //     })
-    // })
+//https://www.misha.wtf/blog/nextjs-supabase-auth
 
-    return (
-        <></>
-    )
-    
-}
-
-export const useUser = () => useContext(userContext)
+//https://ruanmartinelli.com/posts/supabase-authentication-react/
