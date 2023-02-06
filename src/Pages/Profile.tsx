@@ -181,6 +181,3 @@ const Profile = () => {
 
 export default Profile;
 
-//https://www.supabase.jp/docs/guides/storage
-
-//https://zenn.dev/taka_shino/articles/bengo4-advent-calendar-18

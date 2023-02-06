@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { useNavigate, useLoaderData } from "react-router-dom";
-import { Space, Spin } from "antd";
+import { useLoaderData } from "react-router-dom";
+import { Space } from "antd";
 
 import { supabase } from "../Auth/supabaseClient";
 import HomeCard from "../Components/HomeCard";
@@ -10,8 +10,9 @@ import { Post } from "../DataTypes/Post.type";
 import Header from "../Components/Header";
 import { useAuth } from "../Auth/AuthContext";
 
+const { data: { user } } = await supabase.auth.getUser()
 
-export const fetchAllPosts = async (userId: String) => {
+export const fetchAllPosts = async () => {
   let { data: posts, error: postFetchError } = await supabase
     .from("allPosts")
     .select("*, users(*)");
@@ -20,9 +21,8 @@ export const fetchAllPosts = async (userId: String) => {
   const { data: allLikedPosts, error: likedPostFetchError } = await supabase
     .from("likedPosts")
     .select("postId")
-    .eq("likedUserId", userId)  
+    .eq("likedUserId", user!.id)  
   if (likedPostFetchError) throw likedPostFetchError;
-
 
   const allLikedPostsId = allLikedPosts?.map(item => item.postId)
 
@@ -40,41 +40,22 @@ export const fetchAllPosts = async (userId: String) => {
 
 
 const Home = () => {
-  const { user } = useAuth();
-  const [ allPosts, setAllPosts ] = useState<Post[] | null>()
-  // const allPosts = useLoaderData() as Post[];
-
-  const fetchPosts = async () => {
-    const data = await fetchAllPosts(user.id)
-    setAllPosts(data)
-  }
-
-  // fetchPosts()
-
+  const allPosts = useLoaderData() as Post[];
 
   return (
-    <>
-    {/* {console.log(user)} */}
     <div className={homeStyle["Home-wrapper"]}>
       <Header title="Home" />
       <Space direction="vertical" size="middle">
         {allPosts && allPosts.map((item) => (
           <HomeCard item={item} key={item.postId} />
         ))}
-
-        {/* {allPosts!.map((item) => (
-          <HomeCard item={item} key={item.postId} />
-        ))} */}
       </Space>
     </div>
-    </>
   );
-
-  // }
 };
 
 export default Home;
 
-// export const loader = () => {
-//   return fetchAllPosts();
-// };
+export const loader = () => {
+  return fetchAllPosts();
+};

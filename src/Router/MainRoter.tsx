@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-// import { loader as homeLoader } from "../Pages/Home";
+import { loader as homeLoader } from "../Pages/Home";
 import { Spin } from "antd";
 import { AuthProvider } from "../Auth/AuthContext";
 
@@ -16,6 +16,19 @@ const AddPost = lazy(() => import("../Pages/AddPost"));
 import PrivateRoute from "../Auth/PrivateRoute"
 import Navigation from "../Components/Navigation";
 
+const router = createBrowserRouter([
+  {path: "/", element: <PrivateRoute />, children: [
+    {path: "/", element: <Navigation />, children: [
+      {path: "/", element: <Home />, loader: homeLoader},
+      {path: "/find", element: <Find />},
+      {path: "/addpost", element: <AddPost />},
+      {path: "/profile", element: <Profile />},
+      {path: "/editprofile", element: <EditProfile />},
+    ]}
+  ]},
+  {path: "/login", element: <Login />},
+  {path: "/signup", element: <SignUp />}
+])
 
 const MainRoter = () => {
   return (
@@ -35,23 +48,8 @@ const MainRoter = () => {
             <Spin size="large" />
           </div>
         }
-      >      
-        <BrowserRouter>
-          <Routes>
-              <Route path="/" element={<PrivateRoute />}>
-                <Route path="/" element={<Navigation />}>
-                  {/* <Route index element={<Home/>} loader={homeLoader} /> */}
-                  <Route index element={<Home/>} />
-                  <Route path="/find" element={<Find/>} />
-                  <Route path="/profile" element={<Profile/>} />
-                  <Route path="/editProfile" element={<EditProfile/>} />
-                  <Route path="/addpost" element={<AddPost/>} />
-                </Route>
-              </Route>
-            <Route path="/signup" element={<SignUp/>} />            
-            <Route path="/login" element={<Login/>} />            
-          </Routes>
-        </BrowserRouter>
+      >    
+        <RouterProvider router={router} />        
       </Suspense>
     </AuthProvider>
   )

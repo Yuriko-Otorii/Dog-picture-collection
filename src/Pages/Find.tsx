@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { Col, Row, Cascader, Button, Spin } from "antd";
+import { Col, Row, Cascader, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { HeartOutlined } from "@ant-design/icons";

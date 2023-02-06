@@ -21,7 +21,6 @@ const AddPost = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
-  const navigate = useNavigate();
   const [form] = Form.useForm();
 
 
@@ -125,7 +124,3 @@ const AddPost = () => {
 }
 
 export default AddPost;
-
-//https://www.to-r.net/media/supabase-next/
-
-// https://zenn.dev/naoko3in4/articles/c7e75181c2a5a7#%E3%82%B9%E3%83%86%E3%83%BC%E3%83%88%E7%AE%A1%E7%90%86
