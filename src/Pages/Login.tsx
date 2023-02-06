@@ -13,8 +13,8 @@ type loginItems = {
   password: string;
 };
 
-
 const Login = () => {
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [messageApi, contextHolder] = message.useMessage()
 
@@ -23,9 +23,7 @@ const Login = () => {
       const { data } = await supabase.auth.signInWithPassword({
         email: values.email, 
         password: values.password,
-      })    
-      
-      navigate("/") 
+      })
 
       if(data.user){
         navigate("/") 

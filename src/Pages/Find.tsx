@@ -4,7 +4,6 @@ import { Col, Row, Cascader, Button, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { HeartOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 
 import findStyle from "../Styles/find.module.scss";
 import { fetchBreedsList } from "../Redux/Slicers/breedSlice";
@@ -19,53 +18,65 @@ import { changeBtnState } from "../Redux/Slicers/dogImgSlice";
 import dogGif from "../pictures/dogGif.gif"
 import { useAuth } from "../Auth/AuthContext";
 
-type remapObj = {
+export type remapObj = {
   id: number;
   btnState: boolean;
   url: string;
 };
 
-const { data: { user: currentUser } } = await supabase.auth.getUser()
-
 const Find = () => {
+  const { user } = useAuth()
   const state = useSelector((state: RootState) => state);
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const [tempFavPics, setTempFavPics] = useState<string[]>([]);
 
   useEffect(() => {
-    if(!currentUser) navigate("/login")
     dispatch(fetchBreedsList());
     dispatch(fetchAllDogsImg());
   }, []);
-
-  const addFavoritePics = () => {
-    tempFavPics.map(async (item) => {
-      await supabase
-        .from("liked_pics")
-        .insert([{ url: item, user_id: currentUser?.id }]);
-    });
-  };
 
   const handleBreedChange: any = async (value: string | string[]) => {
     dispatch(fetchselectedBreedPics(value));
   };
 
-  const handleLikeBtn = async (value: remapObj) => {
+  const deleteFavPic = async (url: string) => {
+    // Get users favorite img unique key
+    const { data: userFavPics, error } = await supabase
+      .from("likedPics")
+      .select("url, picture_id")
+      .eq("user_id", user.id);
+    if(error) throw error;
+
+    const getImgUrl = userFavPics?.filter((item) => item.url === url);
+
+    // Delete img based on unique key
     try {
+      const { data } = await supabase
+        .from("likedPics")
+        .delete()
+        .eq("picture_id", getImgUrl![0].picture_id);
+    } catch (error) {
+      console.error(error);            
+    }
+  };
+
+  const handleLikeBtn = async (value: remapObj) => {
+    try {      
       if (!value.btnState) {
         //Set True for btnState
         dispatch(changeBtnState(value));
+        
+        //Add pics to likedPics table
+        const {error} = await supabase
+        .from("likedPics")
+        .insert([{ url: value.url, user_id: user.id }]);
+        if(error) throw error;
 
-        //Add url to tempFavPics list
-        setTempFavPics((prev) => {
-          return [...prev, value.url];
-        });
       } else {
         //Set False for btnState
         dispatch(changeBtnState(value));
-        //Remove url to tempFavPics list
-        setTempFavPics((prev) => prev.filter((item) => item !== value.url));
+
+        //Delete url from liked_pics table
+        deleteFavPic(value.url)
       }
     } catch (error) {
       console.error(error);

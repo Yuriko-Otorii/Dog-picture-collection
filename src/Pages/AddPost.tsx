@@ -10,23 +10,20 @@ import addPostStyle from "../Styles/addPost.module.scss";
 import { supabase } from "../Auth/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import Header from "../Components/Header";
+import { useAuth } from "../Auth/AuthContext";
 
 const { TextArea } = Input;
 
-const { data: { user: currentUser } } = await supabase.auth.getUser()
-
 
 const AddPost = () => {
+  const { user } = useAuth()
   const [error, setError] = useState(false)
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState<boolean>(false)
   const [messageApi, contextHolder] = message.useMessage()
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  
-  useEffect(() => {
-    if (!currentUser) navigate("/login");
-  }, []);
+
 
   const handleSubmit = async (values: any) => {
     try {      
@@ -35,16 +32,18 @@ const AddPost = () => {
       const {data, error } = await supabase
         .storage
         .from("post-photos")
-        .upload(`${currentUser?.id}/${uuid}`, values.postImg.file, {
+        .upload(`${user.id}/${uuid}`, values.postImg.file, {
           cacheControl: '3600',
           upsert: false
         })
+      if(error) throw error;
+
 
       const key: string | undefined = data?.path;
       const { data: publicUrl } = supabase.storage.from("post-photos").getPublicUrl(key!)
       
       await supabase.from("all-posts").insert([{
-        userId: currentUser?.id,
+        userId: user.id,
         postText: values.postText,
         postImg: publicUrl
       }])      

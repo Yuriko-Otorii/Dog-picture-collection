@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { Button, Form, Input, Upload, message } from "antd";
 import { UserOutlined, UploadOutlined } from "@ant-design/icons";
@@ -9,19 +9,15 @@ import profileStyle from "../Styles/profile.module.scss";
 import { supabase } from "../Auth/supabaseClient";
 import Header from "../Components/Header";
 import { useNavigate } from "react-router-dom";
-
-const { data: { user: currentUser } } = await supabase.auth.getUser()
+import { useAuth } from "../Auth/AuthContext";
 
 const EditProfile = () => {
+  const { user } = useAuth()
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const navigate = useNavigate();
-
-  useEffect(() => {
-      if (!currentUser) navigate("/login");
-  }, []);
 
   const handleSubmit = async (values: any) => {
     try {
@@ -29,7 +25,7 @@ const EditProfile = () => {
       const uuid = uuidv4();
       const { data, error } = await supabase.storage
         .from("avatar-images")
-        .upload(`${currentUser?.id}/${uuid}`, values.avatarImg.file, {
+        .upload(`${user.id}/${uuid}`, values.avatarImg.file, {
           cacheControl: "3600",
           upsert: false,
         });
@@ -45,7 +41,7 @@ const EditProfile = () => {
           username: values.username,
           avatarImg: publicUrl,
         })
-        .eq("userId", currentUser?.id);
+        .eq("userId", user.id);
 
       form.resetFields();
       setUploading(false);

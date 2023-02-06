@@ -17,7 +17,6 @@ type MenuItem = Required<MenuProps>["items"][number];
 const Navigation = () => {
   const navigate = useNavigate();
   const screens = useBreakpoint();
-  // console.log(screens.sm);
 
   const navItems = [
     { label: "Home", key: "/", icon: <HomeOutlined /> },

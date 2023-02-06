@@ -7,16 +7,13 @@ import { DeleteOutlined } from "@ant-design/icons";
 
 import { supabase } from "../Auth/supabaseClient";
 import favoritePicsStyle from "../Styles/profile.module.scss";
-import { FavObj as FavListType } from "../Components/FavoritePics";
 import dogGif3 from "../pictures/dogGif3.gif";
+import { useAuth } from "../Auth/AuthContext";
 
-const {
-  data: { session },
-} = await supabase.auth.getSession();
 
 type Props = {
   picList: FavObj[];
-  setList: React.Dispatch<React.SetStateAction<FavListType[]>>;
+  setList: React.Dispatch<React.SetStateAction<FavObj[]>>;
 };
 
 export type FavObj = {
@@ -24,24 +21,30 @@ export type FavObj = {
 };
 
 const FavoritePics = ({ picList, setList }: Props) => {
+  const { user } = useAuth()
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
   const deleteFavPic = async (value: string) => {
-    // Get users favorite img unique key
-    const { data: userFavPics } = await supabase
-      .from("liked-pics")
+    // Get users all favorite pic's info
+    const { data: userFavPics, error } = await supabase
+      .from("likedPics")
       .select("url, picture_id")
-      .eq("user_id", session?.user.id);
-    const getImgUrl = userFavPics!.filter((item) => item.url === value);
+      .eq("user_id", user.id);
+    if(error) throw error;
 
-    // Delete img base on unique key
+    //Get target item by provided url
+    const targetItem = userFavPics!.filter((item) => item.url === value);
+
+    // Delete img based on unique id
     try {
       const { data } = await supabase
-        .from("liked-pics")
+        .from("likedPics")
         .delete()
-        .eq("picture_id", getImgUrl![0].picture_id);
-      setList(picList.filter((item: FavObj) => item.url !== getImgUrl![0].url));
+        .eq("picture_id", targetItem![0].picture_id);
+      
+      //Reset the fabPics state
+      setList(picList.filter((item: FavObj) => item.url !== targetItem![0].url));
 
       messageApi.open({
         type: "success",
@@ -87,14 +90,14 @@ const FavoritePics = ({ picList, setList }: Props) => {
             })
           ) : (
             <div className={favoritePicsStyle["Profile-no-favorite-posts"]}>
-              <h3>No favorite pictures</h3>
+              <h3>No favorite pictures!</h3>
               <Button
                 onClick={() => {
                   navigate("/find");
                 }}
                 type="link"
               >
-                Find your favorite
+                Find your favorite!
               </Button>
               <img src={dogGif3} alt="Dog gif" />
             </div>

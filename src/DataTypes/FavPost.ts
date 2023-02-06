@@ -1,5 +1,7 @@
-import { User } from "../DataTypes/User.type"
-export interface Post {
+import { User } from "./User.type"
+import { Post } from "./Post.type"
+
+export interface favPost {
     postId: number;
     userId: number;
     postText: string;
@@ -7,4 +9,5 @@ export interface Post {
     postDate: string;
     users: User;
     likedState: boolean;
+    postedUserInfo: User;
 }

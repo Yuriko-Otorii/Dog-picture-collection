@@ -1,19 +1,19 @@
-import { ReactNode } from 'react'
-import { Navigate, Outlet } from 'react-router-dom';
+import { ReactNode, useEffect } from 'react'
+import { Navigate, Outlet, Route } from 'react-router-dom';
 
 import { useAuth } from './AuthContext';
 
-type Props = {
-    children?: ReactNode;
-};
 
-function PrivateRoute({children}: Props) {
+function PrivateRoute() {
     const { user } = useAuth();
+    // console.log(user)
 
     if(!user){
         return <Navigate to="/login" />
     }
-    return <>{children}</>
+    return (
+        <Outlet /> 
+    )
 }
 
 export default PrivateRoute

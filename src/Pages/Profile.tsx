@@ -7,44 +7,82 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../Auth/supabaseClient";
 import profileStyle from "../Styles/profile.module.scss";
 import FavoritePics from "../Components/FavoritePics";
-import { FavObj as FavListType } from "../Components/FavoritePics";
+import { FavObj } from "../Components/FavoritePics";
 import Header from "../Components/Header";
 import FavoritePosts from "../Components/FavoritePosts";
 import { Post } from '../DataTypes/Post.type' 
 import { useAuth } from "../Auth/AuthContext";
+import { favPost } from "../DataTypes/FavPost";
 
 type UserInfo = {
   username: string;
   avatarImg: string;
 };
 
-const { data: { user: currentUser } } = await supabase.auth.getUser()
-
 const Profile = () => {
+  const { user } = useAuth()
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [favPics, setFavPics] = useState<FavListType[]>([]);
+  const [favPics, setFavPics] = useState<FavObj[]>([]);
+  const [favPosts, setFavPosts] = useState<any[]>([]);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+
 
   const fetchFavPics = async () => {
     try {
-      const { data }: any = await supabase
-        .from("liked-pics")
+      const { data: favPicsList }: any = await supabase
+        .from("likedPics")
         .select("url")
-        .eq("user_id", currentUser?.id);
-      setFavPics(data);
+        .eq("user_id", user.id);
+      setFavPics(favPicsList);
     } catch (error) {
       console.error(error);
     }
   };
 
+  const fetchFavPosts = async () => {
+    try {
+      const { data: favPostListId, error } = await supabase
+        .from("likedPosts")
+        .select("postId")
+        .eq("likedUserId", user.id)   
+      if(error) throw error;   
+
+      //Create favPostList
+      const likedPostList: favPost[] = [];
+
+      favPostListId.forEach(async (item: {postId: string}) => {
+        const { data, error } = await supabase
+        .from("allPosts")
+        .select("*, users(*)")
+        .eq("postId", item.postId);
+        if(error) throw error;   
+        
+        const likedPostObj: favPost = data![0];
+        
+        const postImgUrl = await JSON.parse(likedPostObj.postImg).publicUrl
+        likedPostObj.postImg = postImgUrl
+  
+        const avatarImgUrl = await JSON.parse(likedPostObj.users.avatarImg).publicUrl;
+        likedPostObj.users.avatarImg = avatarImgUrl
+  
+        likedPostList.push(likedPostObj)
+      }); 
+
+      setFavPosts(likedPostList)      
+        
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const fetchUsersPosts = async () => {
     try {
-      const { data }: any = await supabase
-        .from("all-posts")
+      const { data: userPosts }: any = await supabase
+        .from("allPosts")
         .select("*")
-        .eq("userId", currentUser?.id);     
-        setUserPosts(data);
+        .eq("userId", user.id);     
+        setUserPosts(userPosts);
     } catch (error) {
       console.error(error);
     }
@@ -55,7 +93,7 @@ const Profile = () => {
       const { data }: any = await supabase
         .from("users")
         .select("username, avatarImg")
-        .eq("userId", currentUser?.id);         
+        .eq("userId", user.id);         
 
         if(data[0].avatarImg){
           setUserInfo({
@@ -71,14 +109,15 @@ const Profile = () => {
     } catch (error) {
       console.error(error)
     }
-    
   };
 
+
   useEffect(() => {
-    // if (!session) navigate("/login");
     fetchFavPics();
     fetchUsersPosts();
-    fetchUserInfo();    
+    fetchUserInfo();   
+    fetchFavPosts();    
+    
   }, []);  
 
   const handleLogout = async () => {
@@ -124,10 +163,15 @@ const Profile = () => {
               children: <FavoritePics picList={favPics} setList={setFavPics} />,
             },
             {
-              label: `Posts`,
+              label: `Favorite Posts`,
               key: "2",
-              children: <FavoritePosts postList={userPosts} setList={setUserPosts}/>,
+              children: <FavoritePosts favPostList={favPosts} setList={setFavPosts}/>,
             },
+            // {
+            //   label: `User Posts`,
+            //   key: "3",
+            //   children: <FavoritePosts favPostList={favPosts} setList={setUserPosts}/>,
+            // },
           ]}
         />
       </div>

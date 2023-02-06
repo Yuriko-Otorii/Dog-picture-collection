@@ -4,34 +4,14 @@ import { v4 as uuidv4 } from "uuid";
 
 import { supabase } from "../../Auth/supabaseClient";
 
-type userFavPic = {
-    url: string;
-    picture_id: string;
-}
-
-type remapObj = {
-    btnState: boolean;
-    url: string;
-}
-
 const {
     data: { session },
   } = await supabase.auth.getSession();
-
-//   const getUsersFavPics = async(): userFavPic[] => {
-//     //Get users fav images
-//     const { data: userFavPics } = await supabase
-//     .from("liked_pics")
-//     .select('url, picture_id')
-//     .eq("user_id", session?.user.id)
-//     return userFavPics
-//   }
 
 export const fetchAllDogsImg = createAsyncThunk(
     "dogImgs/fetchDogsImgState",
     async () => {
         //Create payload
-
         //Get all dogs images from API 
         const response = await axios.get('https://dog.ceo/api/breeds/image/random/30')
         const imgsList = await response.data.message
@@ -40,15 +20,17 @@ export const fetchAllDogsImg = createAsyncThunk(
         })
         
         //Check if users fav images are in display images
-        const { data: userFavPics } = await supabase
-        .from("liked-pics")
+        const { data: userFavPics, error } = await supabase
+        .from("likedPics")
         .select('url')
         .eq("user_id", session?.user.id)
+        if(error) throw error;
+
         const userFavPicsArr =  userFavPics?.map((item) => item.url)
         const likedImgs = imgsList.filter((itemFromApi: string) => userFavPicsArr!.includes(itemFromApi))
 
         //Create liked btn state
-        const setBtnStateList = remapImgsList.map((item: remapObj) => {
+        const setBtnStateList = remapImgsList.map((item: dogImgObj) => {
             if(likedImgs.includes(item.url)){
                 return {btnState: true, url: item.url}
             }else{
@@ -74,15 +56,17 @@ export const fetchselectedBreedPics = createAsyncThunk(
             })
 
             //Check if users fav images are in display images
-            const { data: userFavPics } = await supabase
-            .from("liked-pics")
+            const { data: userFavPics, error } = await supabase
+            .from("likedPics")
             .select('url')
             .eq("user_id", session?.user.id)
+            if(error) throw error;
+
             const userFavPicsArr =  userFavPics?.map((item) => item.url)
             const likedImgs = imgsList.filter((itemFromApi: string) => userFavPicsArr!.includes(itemFromApi))            
 
             //Create liked btn state
-            const setBtnStateList = remapImgsList.map((item: remapObj) => {
+            const setBtnStateList = remapImgsList.map((item: dogImgObj) => {
                 if(likedImgs.includes(item.url)){
                     return {btnState: true, url: item.url}
                 }else{
@@ -102,15 +86,17 @@ export const fetchselectedBreedPics = createAsyncThunk(
             })
 
             //Check if users fav images are in display images
-            const { data: userFavPics } = await supabase
-            .from("liked-pics")
+            const { data: userFavPics, error } = await supabase
+            .from("likedPics")
             .select('url')
             .eq("user_id", session?.user.id)
+            if(error) throw error;
+
             const userFavPicsArr =  userFavPics?.map((item) => item.url)
             const likedImgs = imgsList.filter((itemFromApi: string) => userFavPicsArr!.includes(itemFromApi))
 
             //Create liked btn state
-            const setBtnStateList = remapImgsList.map((item: remapObj) => {
+            const setBtnStateList = remapImgsList.map((item: dogImgObj) => {
                 if(likedImgs.includes(item.url)){
                     return {btnState: true, url: item.url}
                 }else{
@@ -122,16 +108,18 @@ export const fetchselectedBreedPics = createAsyncThunk(
     }
 )
 
+type dogImgObj = {
+    btnState: boolean;
+    url: string;
+}
 export interface dogImgState {
-    dogImgList: remapObj[]
+    dogImgList: dogImgObj[]
     loading: 'idle' | 'pending' | 'succeeded' | 'failed'
-    // likedimgs: string[]
 } 
 
 const initialState = {
     dogImgList: [],
     loading: 'idle',
-    // likedimgs: []
 } as dogImgState
 
 const dogImgSlice = createSlice({

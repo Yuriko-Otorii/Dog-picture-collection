@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useNavigate, useLoaderData } from "react-router-dom";
 import { Space, Spin } from "antd";
@@ -10,13 +10,26 @@ import { Post } from "../DataTypes/Post.type";
 import Header from "../Components/Header";
 import { useAuth } from "../Auth/AuthContext";
 
-export const fetchAllPosts = async () => {
-  let { data: posts, error } = await supabase
-    .from("all-posts")
+
+export const fetchAllPosts = async (userId: String) => {
+  let { data: posts, error: postFetchError } = await supabase
+    .from("allPosts")
     .select("*, users(*)");
-  if (error) console.log("error", error);
+  if (postFetchError) throw postFetchError;
+
+  const { data: allLikedPosts, error: likedPostFetchError } = await supabase
+    .from("likedPosts")
+    .select("postId")
+    .eq("likedUserId", userId)  
+  if (likedPostFetchError) throw likedPostFetchError;
+
+
+  const allLikedPostsId = allLikedPosts?.map(item => item.postId)
 
   posts?.map((item) => {
+    allLikedPostsId?.includes(item.postId)
+    ? item.likedState = true
+    : item.likedState = false
     const postImgUrl = JSON.parse(item.postImg).publicUrl;
     const avatarImgUrl = JSON.parse(item.users.avatarImg).publicUrl;
     return (item.postImg = postImgUrl), (item.users.avatarImg = avatarImgUrl);
@@ -25,24 +38,36 @@ export const fetchAllPosts = async () => {
   return posts;
 };
 
-const Home = () => {
-  const navigate = useNavigate();
-  const allPosts = useLoaderData() as Post[];
-  const { user } = useAuth();
 
-  useEffect(() => {
-    // if(!currentUser) navigate("/login")
-  });
+const Home = () => {
+  const { user } = useAuth();
+  const [ allPosts, setAllPosts ] = useState<Post[] | null>()
+  // const allPosts = useLoaderData() as Post[];
+
+  const fetchPosts = async () => {
+    const data = await fetchAllPosts(user.id)
+    setAllPosts(data)
+  }
+
+  // fetchPosts()
+
 
   return (
+    <>
+    {/* {console.log(user)} */}
     <div className={homeStyle["Home-wrapper"]}>
       <Header title="Home" />
       <Space direction="vertical" size="middle">
-        {allPosts.map((item) => (
+        {allPosts && allPosts.map((item) => (
           <HomeCard item={item} key={item.postId} />
         ))}
+
+        {/* {allPosts!.map((item) => (
+          <HomeCard item={item} key={item.postId} />
+        ))} */}
       </Space>
     </div>
+    </>
   );
 
   // }
@@ -50,6 +75,6 @@ const Home = () => {
 
 export default Home;
 
-export const loader = () => {
-  return fetchAllPosts();
-};
+// export const loader = () => {
+//   return fetchAllPosts();
+// };
