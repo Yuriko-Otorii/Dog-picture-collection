@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import {
   HomeOutlined,
   FileAddOutlined,
@@ -10,13 +12,21 @@ import type { MenuProps } from "antd";
 const { useBreakpoint } = Grid;
 
 import navStyle from "../Styles/navigation.module.scss";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 const Navigation = () => {
   const navigate = useNavigate();
   const screens = useBreakpoint();
+  const { pathname } = useLocation()
+  const [currentPath, serCurrentPath] = useState(pathname)
+  const [selectedKey, setSelectedKey] = useState([currentPath]);
+
+  useEffect(() => {    
+    serCurrentPath(pathname)
+    setSelectedKey([currentPath])
+  }, [pathname])
 
   const navItems = [
     { label: "Home", key: "/", icon: <HomeOutlined /> },
@@ -58,6 +68,7 @@ const Navigation = () => {
             mode="horizontal"
             onClick={({ key }) => navigate(key)}
             className={navStyle["Navigation-body"]}
+            selectedKeys={selectedKey}
           />
         </div>
       ) : (

@@ -145,7 +145,6 @@ const dogImgSlice = createSlice({
         })
         builder.addCase(fetchAllDogsImg.fulfilled, (state, action) => {
             state.dogImgList = action.payload[0]
-            // state.likedimgs = action.payload[1]
             state.loading = "succeeded"      
         })
         builder.addCase(fetchAllDogsImg.rejected, (state) => {
@@ -158,7 +157,6 @@ const dogImgSlice = createSlice({
         })
         builder.addCase(fetchselectedBreedPics.fulfilled, (state, action) => {
             state.dogImgList = action.payload[0]
-            // state.likedimgs = action.payload[1]
             state.loading = "succeeded"       
         })
         builder.addCase(fetchselectedBreedPics.rejected, (state) => {

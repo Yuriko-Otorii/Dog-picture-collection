@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import { loader as homeLoader } from "../Pages/Home";
@@ -19,7 +19,8 @@ import Navigation from "../Components/Navigation";
 const router = createBrowserRouter([
   {path: "/", element: <PrivateRoute />, children: [
     {path: "/", element: <Navigation />, children: [
-      {path: "/", element: <Home />, loader: homeLoader},
+      // {path: "/", element: <Home />, loader: homeLoader},
+      {path: "/", element: <Home />},
       {path: "/find", element: <Find />},
       {path: "/addpost", element: <AddPost />},
       {path: "/profile", element: <Profile />},

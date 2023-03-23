@@ -40,7 +40,16 @@ export const fetchAllPosts = async () => {
 
 
 const Home = () => {
-  const allPosts = useLoaderData() as Post[];
+  // const allPosts = useLoaderData() as Post[];
+  const [allPosts, setAllPost] = useState<Post[] | null>([])
+ 
+  useEffect(() => {
+    const setPosts = async () => {
+      const loadPosts: Post[] | null = await fetchAllPosts()
+      setAllPost(loadPosts)
+    }
+    setPosts()
+  }, [])
 
   return (
     <div className={homeStyle["Home-wrapper"]}>

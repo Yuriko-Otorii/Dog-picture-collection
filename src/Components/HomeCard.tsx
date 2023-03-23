@@ -81,7 +81,9 @@ const HomeCard = ({ item }: { item: Post }) => {
           src={item.postImg}
           style={{ width: "300px", height: "250px" }}
         />
+        
       }
+      bodyStyle={{padding: "1rem 1rem .5rem"}}
       actions={[
         <HeartOutlined key="Favorite" onClick={() => handleLikeBtn(item)} style={
           likeBtnState
@@ -90,12 +92,15 @@ const HomeCard = ({ item }: { item: Post }) => {
         }/>,
       ]}
     >
-      <Meta title={item.postText} />
-      <div className={homeCardStyle["HomeCard-post-user"]}>
-        <Avatar shape="square" size="small" src={item.users.avatarImg} />
-        <p style={{ fontSize: ".8rem" }}>{item.users.username}</p>
+      <Meta title={item.postText} style={{margin: "0 0 .6rem"}} />
+
+      <div className={homeCardStyle["HomeCard-user-date-Wrapper"]}>
+        <div className={homeCardStyle["HomeCard-post-user"]}>
+          <Avatar shape="square" size="small" src={item.users.avatarImg} />
+          <p style={{ fontSize: ".8rem" }}>{item.users.username}</p>
+        </div>
+        <p style={{ marginTop: ".5rem", fontSize: ".7rem" }}>{timestamp}</p>
       </div>
-      <p style={{ marginTop: ".5rem", fontSize: ".7rem" }}>{timestamp}</p>
     </Card>
   );
 };
