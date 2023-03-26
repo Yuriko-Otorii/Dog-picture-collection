@@ -8,7 +8,7 @@ You can also share your dog’s picture. Of course, you can see other’s dog pi
 What is the motivation to create this app? Because I love dogs so much :)
 
 # Demo
-https://dog-pictures-yuriko-otorii.vercel.app  
+https://dog-pictures.vercel.app
 
 # Features
 -Find a plenty number of dog pictures randomly.
@@ -19,7 +19,7 @@ https://dog-pictures-yuriko-otorii.vercel.app
 -You can delete and organize your favorite pictures and posts from your account page.
 
 ## Frameworks and database
-React  
+React(TypeScript)  
 Ant Design  
 Supabase  
 
