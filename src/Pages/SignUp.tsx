@@ -3,7 +3,7 @@ import React from "react";
 import { Button, Form, Input } from "antd";
 import { LockOutlined, UserOutlined, MailOutlined } from "@ant-design/icons";
 
-import signUpStyle from "../styles/signup.module.scss";
+import signUpStyle from "../Styles/signup.module.scss";
 import { supabase } from "../Auth/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
 

@@ -5,6 +5,7 @@ import {
   HeartOutlined,
 } from "@ant-design/icons";
 import { formatDistance } from "date-fns";
+import { User } from "@supabase/supabase-js";
 
 import { Post } from "../DataTypes/Post.type";
 import homeCardStyle from "../Styles/homeCard.module.scss";
@@ -12,19 +13,25 @@ import { useEffect, useState } from "react";
 import { supabase } from "../Auth/supabaseClient";
 const { Meta } = Card;
 
-const {
-  data: { user: currentUser },
-} = await supabase.auth.getUser();
 
-// console.log(currentUser);
+const getUser = async () => {
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  return currentUser;
+}
 
 const HomeCard = ({ item }: { item: Post }) => {
+  const [currentUser, setCurrentUser] = useState<User| null>(null);
   const [likeBtnState, setLikeBtnState] = useState<boolean | null | undefined>(item.likedState);
   const timestamp = formatDistance(new Date(item.postDate), new Date(), {
     addSuffix: true,
   });
 
-  useEffect(() => {        
+  useEffect(() => {       
+    const fetchUser = async () => {
+      const user = await getUser();
+      setCurrentUser(user);
+    };
+    fetchUser(); 
   }, [])
   
   

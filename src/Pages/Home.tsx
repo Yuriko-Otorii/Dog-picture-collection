@@ -10,13 +10,18 @@ import { Post } from "../DataTypes/Post.type";
 import Header from "../Components/Header";
 import { useAuth } from "../Auth/AuthContext";
 
-const { data: { user } } = await supabase.auth.getUser()
+const getUser = async () => {
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  return currentUser;
+}
 
-export const fetchAllPosts = async () => {
+export const fetchAllPosts = async (): Promise<any> => {
   let { data: posts, error: postFetchError } = await supabase
     .from("allPosts")
     .select("*, users(*)");
   if (postFetchError) throw postFetchError;
+
+  const user = await getUser()
 
   const { data: allLikedPosts, error: likedPostFetchError } = await supabase
     .from("likedPosts")

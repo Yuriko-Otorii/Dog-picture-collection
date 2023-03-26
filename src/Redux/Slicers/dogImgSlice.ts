@@ -4,9 +4,15 @@ import { v4 as uuidv4 } from "uuid";
 
 import { supabase } from "../../Auth/supabaseClient";
 
-const {
-    data: { session },
-  } = await supabase.auth.getSession();
+// const {
+//     data: { session },
+//   } = await supabase.auth.getSession();
+
+  
+const getSession = async () => {
+    const {data: { session }} = await supabase.auth.getSession();
+    return session
+}
 
 export const fetchAllDogsImg = createAsyncThunk(
     "dogImgs/fetchDogsImgState",
@@ -19,6 +25,8 @@ export const fetchAllDogsImg = createAsyncThunk(
             return {id: uuidv4(), btnState: false, url: item}
         })
         
+        const session = await getSession()
+
         //Check if users fav images are in display images
         const { data: userFavPics, error } = await supabase
         .from("likedPics")
@@ -55,6 +63,8 @@ export const fetchselectedBreedPics = createAsyncThunk(
                 return {btnState: false, url: item}
             })
 
+            const session = await getSession()
+
             //Check if users fav images are in display images
             const { data: userFavPics, error } = await supabase
             .from("likedPics")
@@ -84,6 +94,8 @@ export const fetchselectedBreedPics = createAsyncThunk(
             const remapImgsList = imgsList.map((item: string) => {
                 return {btnState: false, url: item}
             })
+
+            const session = await getSession()
 
             //Check if users fav images are in display images
             const { data: userFavPics, error } = await supabase

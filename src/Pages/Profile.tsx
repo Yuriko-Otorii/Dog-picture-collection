@@ -58,7 +58,7 @@ const Profile = () => {
         .eq("postId", item.postId);
         if(error) throw error;   
         
-        const likedPostObj: favPost = data![0];
+        const likedPostObj: favPost = data![0] as favPost;
         
         const postImgUrl = await JSON.parse(likedPostObj.postImg).publicUrl
         likedPostObj.postImg = postImgUrl
