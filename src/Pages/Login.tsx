@@ -25,7 +25,7 @@ const Login = () => {
 
       if(data.user){
         localStorage.setItem('token', data.session!.refresh_token)
-        navigate("/home") 
+        navigate("/") 
         
       }else{
         messageApi.open({

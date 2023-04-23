@@ -1,13 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { useAuth } from './AuthContext';
-
 function PrivateRoute() {
-    const { user } = useAuth()
-    const token = localStorage.getItem("token")    
-
-    console.log(token);
-    
+    const token = localStorage.getItem("token")        
         
     if(!token){
         console.log("!tolen");

@@ -19,8 +19,7 @@ import Navigation from "../Components/Navigation";
 const router = createBrowserRouter([
   {path: "/", element: <PrivateRoute />, children: [
     {path: "/", element: <Navigation />, children: [
-      // {path: "/", element: <Home />, loader: homeLoader},
-      {path: "/home", element: <Home />},
+      {path: "/", element: <Home />, loader: homeLoader},
       {path: "/find", element: <Find />},
       {path: "/addpost", element: <AddPost />},
       {path: "/profile", element: <Profile />},
