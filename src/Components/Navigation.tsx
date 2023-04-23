@@ -29,14 +29,14 @@ const Navigation = () => {
   }, [pathname])
 
   const navItems = [
-    { label: "Home", key: "/", icon: <HomeOutlined /> },
+    { label: "Home", key: "/home", icon: <HomeOutlined /> },
     { label: "Post", key: "/addpost", icon: <FileAddOutlined /> },
     { label: "Find", key: "/find", icon: <SearchOutlined /> },
     { label: "Profile", key: "/profile", icon: <UserOutlined /> },
   ];
 
   const verticalMenuItems: MenuProps["items"] = [
-    getItem("Home", "/", <HomeOutlined />),
+    getItem("Home", "/home", <HomeOutlined />),
     getItem("Post", "/addPost", <FileAddOutlined />),
     getItem("Find", "/find", <SearchOutlined />),
     getItem("Profile", "/profile", <UserOutlined />),

@@ -1,12 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { useAuth } from './AuthContext';
-
-
 function PrivateRoute() {
-    const { user } = useAuth();
+    const refreshToken = localStorage.getItem("refreshToken")
     
-    if(!user){
+    if(!refreshToken){
         return <Navigate to="/login" />
     }
     return (

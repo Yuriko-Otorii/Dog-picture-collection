@@ -4,10 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { supabase } from "../../Auth/supabaseClient";
 
-// const {
-//     data: { session },
-//   } = await supabase.auth.getSession();
-
   
 const getSession = async () => {
     const {data: { session }} = await supabase.auth.getSession();

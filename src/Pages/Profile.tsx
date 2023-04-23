@@ -122,58 +122,62 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    localStorage.removeItem('refreshToken')
     navigate("/login");
   };
 
   return (
     <div className={profileStyle["Profile-body-wrapper"]}>
       <Header title="Profile Page" />
-      <div className={profileStyle["Profile-header-wrapper"]}>
-        <div className={profileStyle["Profile-user-wrapper"]}>
-          {userInfo?.avatarImg ? (
-            <Avatar shape="square" size={64} src={userInfo?.avatarImg} />
-          ) : (
-            <Avatar shape="square" size={64} icon={<UserOutlined />} />
-          )}
+      <div className="Profile-user-contents-wrapper">
+        <div className={profileStyle["Profile-header-wrapper"]}>
+          <div className={profileStyle["Profile-user-wrapper"]}>
+            {userInfo?.avatarImg ? (
+              <Avatar shape="square" size={64} src={userInfo?.avatarImg} />
+            ) : (
+              <Avatar shape="square" size={64} icon={<UserOutlined />} />
+            )}
 
-          <h3 style={{ marginLeft: "1.5rem" }}>{userInfo?.username}</h3>
+            <h3 style={{ marginLeft: "1.5rem" }}>{userInfo?.username}</h3>
+          </div>
+          <div className={profileStyle["Profile-btn-wrapper"]}>
+            <Button
+              icon={<EditOutlined />}
+              type="link"
+              onClick={() => {
+                navigate("/editprofile");
+              }}
+            >
+              Edit profile
+            </Button>
+            <Button onClick={handleLogout}>Log out</Button>
+          </div>
         </div>
-        <div className={profileStyle["Profile-btn-wrapper"]}>
-          <Button
-            icon={<EditOutlined />}
-            type="link"
-            onClick={() => {
-              navigate("/editprofile");
-            }}
-          >
-            Edit profile
-          </Button>
-          <Button onClick={handleLogout}>Log out</Button>
-        </div>
-      </div>
 
-      <div className={profileStyle["Profile-tab-wrapper"]}>
-        <Tabs
-          tabBarStyle={{ margin: "0 auto" }}
-          defaultActiveKey="1"
-          items={[
-            {
-              label: `Favorite Pics`,
-              key: "1",
-              children: <FavoritePics picList={favPics} setList={setFavPics} />,
-            },
-            {
-              label: `Favorite Posts`,
-              key: "2",
-              children: <FavoritePosts favPostList={favPosts} setList={setFavPosts}/>,
-            },
-            // {
-            //   label: `User Posts`,
-            //   key: "3",
-            //   children: <FavoritePosts favPostList={favPosts} setList={setUserPosts}/>,
-            // },
-          ]}
-        />
+        <div className={profileStyle["Profile-tab-wrapper"]}>
+          <Tabs
+            tabBarStyle={{ margin: "0 auto" }}
+            defaultActiveKey="1"
+            items={[
+              {
+                label: `Favorite Pics`,
+                key: "1",
+                children: <FavoritePics picList={favPics} setList={setFavPics} />,
+              },
+              {
+                label: `Favorite Posts`,
+                key: "2",
+                children: <FavoritePosts favPostList={favPosts} setList={setFavPosts}/>,
+              },
+              // {
+              //   label: `User Posts`,
+              //   key: "3",
+              //   children: <FavoritePosts favPostList={favPosts} setList={setUserPosts}/>,
+              // },
+            ]}
+          />
+        </div>
+
       </div>
     </div>
   );

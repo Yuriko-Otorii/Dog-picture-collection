@@ -24,12 +24,15 @@ export function useAuth() {
 }
 
 export const AuthProvider = ({ children }: Props) => {
-  const [user, setUser] = useState<User | null>(null);
-
+  const [user, setUser] = useState<User | null | any>(null);
+  
   useEffect(() => {
     const getSession = async () => {
       const { data: {session} } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
+      setUser(session?.user ?? null)      
+      if(session){
+        localStorage.setItem('refreshToken', session.refresh_token)
+      }
     }
 
     getSession()

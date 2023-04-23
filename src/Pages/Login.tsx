@@ -21,10 +21,10 @@ const Login = () => {
       const { data } = await supabase.auth.signInWithPassword({
         email: values.email, 
         password: values.password,
-      })
+      })      
 
       if(data.user){
-        navigate("/") 
+        navigate("/home") 
         
       }else{
         messageApi.open({

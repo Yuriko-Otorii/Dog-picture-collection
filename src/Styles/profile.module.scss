@@ -6,11 +6,17 @@
     padding-bottom: 2rem;
 }
 
+.Profile-user-contents-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .Profile-header-wrapper{
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin: 1rem 0;
+    margin: 1rem auto;
     border: 1px solid #ebebeb;
     border-radius: 10px;
     padding: .5rem 0;
@@ -118,4 +124,11 @@
     align-items: center;
     gap: .5rem;
     margin-top: 1rem;
+}
+
+@media screen and (min-width: 1024px) {
+    .Profile-user-contents-wrapper{
+        flex-direction: row;
+    }
+
 }

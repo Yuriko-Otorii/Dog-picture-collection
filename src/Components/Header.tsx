@@ -8,7 +8,7 @@ type Props = {
 const Header = ({title}: Props) => {
   return (
     <>
-        <h2 style={{ marginBottom: "1rem" }}>{title}</h2>
+        <h2 style={{ margin: "1rem auto" }}>{title}</h2>
     </>
   )
 }

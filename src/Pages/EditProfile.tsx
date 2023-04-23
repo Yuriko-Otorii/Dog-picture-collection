@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from "uuid";
 import profileStyle from "../Styles/profile.module.scss";
 import { supabase } from "../Auth/supabaseClient";
 import Header from "../Components/Header";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Auth/AuthContext";
 
 const EditProfile = () => {
@@ -17,35 +16,61 @@ const EditProfile = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
-  const navigate = useNavigate();
 
   const handleSubmit = async (values: any) => {
     try {
       setUploading(true);
       const uuid = uuidv4();
-      const { data, error } = await supabase.storage
-        .from("avatar-images")
-        .upload(`${user.id}/${uuid}`, values.avatarImg.file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      const key: string | undefined = data?.path;
-      const { data: publicUrl } = supabase.storage
-        .from("avatar-images")
-        .getPublicUrl(key!);
-
-      await supabase
-        .from("users")
-        .update({
-          username: values.username,
-          avatarImg: publicUrl,
-        })
-        .eq("userId", user.id);
+      if(values.avatarImg && values.username){
+        const { data, error } = await supabase.storage
+          .from("avatar-images")
+          .upload(`${user.id}/${uuid}`, values.avatarImg.file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+  
+        const key: string | undefined = data?.path;
+        const { data: publicUrl } = supabase.storage
+          .from("avatar-images")
+          .getPublicUrl(key!);      
+        
+        await supabase
+          .from("users")
+          .update({
+            username: values.username,
+            avatarImg: publicUrl,
+          })
+          .eq("userId", user.id);
+      }else if(!(values.avatarImg)){
+        await supabase
+          .from("users")
+          .update({
+            username: values.username,
+          })
+          .eq("userId", user.id);
+      }else if(!(values.username)){
+        const { data, error } = await supabase.storage
+          .from("avatar-images")
+          .upload(`${user.id}/${uuid}`, values.avatarImg.file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+  
+        const key: string | undefined = data?.path;
+        const { data: publicUrl } = supabase.storage
+          .from("avatar-images")
+          .getPublicUrl(key!);      
+        
+        await supabase
+          .from("users")
+          .update({
+            avatarImg: publicUrl,
+          })
+          .eq("userId", user.id);
+      }
 
       form.resetFields();
       setUploading(false);
-
       //Success alart
       messageApi.open({
         type: "success",
@@ -111,5 +136,3 @@ const EditProfile = () => {
 };
 
 export default EditProfile;
-
-// https://software.pitang1965.com/2022/07/28/supabase-getting-started/

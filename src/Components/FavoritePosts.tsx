@@ -101,7 +101,7 @@ const FavoritePosts = ({ favPostList, setList }: Props) => {
               <h3>No favorite posts!</h3>
               <Button
                 onClick={() => {
-                  navigate("/");
+                  navigate("/home");
                 }}
                 type="link"
               >
