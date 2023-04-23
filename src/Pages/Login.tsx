@@ -21,9 +21,10 @@ const Login = () => {
       const { data } = await supabase.auth.signInWithPassword({
         email: values.email, 
         password: values.password,
-      })      
+      })            
 
       if(data.user){
+        localStorage.setItem('token', data.session!.refresh_token)
         navigate("/home") 
         
       }else{

@@ -111,18 +111,16 @@ const Profile = () => {
     }
   };
 
-
   useEffect(() => {
     fetchFavPics();
     fetchUsersPosts();
     fetchUserInfo();   
     fetchFavPosts();    
-    
   }, []);  
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('token')
     navigate("/login");
   };
 

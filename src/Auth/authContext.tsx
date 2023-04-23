@@ -29,12 +29,8 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const getSession = async () => {
       const { data: {session} } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)      
-      if(session){
-        localStorage.setItem('refreshToken', session.refresh_token)
-      }
+      setUser(session?.user ?? null)
     }
-
     getSession()
   }, []);
 
